@@ -44,3 +44,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 자동 코드 리뷰는 최대 1회, 가장 낮은 강도(`code-review low`)로만 돌린다. 리뷰어를 못 부르면 그 사실만 적고 완료로 본다.
 - 지적 중 스펙의 수용 기준을 깨거나 주 경로가 실제로 깨지는 것만 고친다. 나머지는 `docs/follow-ups/`에 한 줄로 남긴다. 재리뷰는 하지 않는다.
 - 스펙이 요구하지 않은 보안 하드닝·엣지케이스·성능 방어는 범위 밖이다.
+
+<!-- BEGIN:google-maps-platform-context -->
+
+# Google Maps Platform 최신 문서
+
+Places API (New)나 Maps JavaScript API를 다루는 작업을 시작할 때, 코드를 쓰기 전에 공식 문서(`https://developers.google.com/maps/documentation/places/web-service/overview`, `https://developers.google.com/maps/documentation/javascript/overview`)에서 해당 API의 현재 요청 형식, 필드 마스크, 제한과 요금 등급을 가져와 확인한다. 저장된 기억이나 복사본을 최신으로 취급하지 않는다.
+
+- 공식 `llms.txt`는 없다(`developers.google.com/maps/llms.txt`가 404). 변하는 문서는 위 공식 문서가 원본이다.
+- 공식 에이전트 스킬 `googlemaps/agent-skills@google-maps-platform`은 설치하지 못했다. 배포된 `SKILL.md`의 `description`에 따옴표 없는 콜론이 있어 Skills CLI 1.9.0이 YAML 오류로 건너뛴다. 업스트림이 고치면 `skills add googlemaps/agent-skills --skill google-maps-platform --agent codex claude-code --copy -y`로 설치한다.
+
+<!-- END:google-maps-platform-context -->
