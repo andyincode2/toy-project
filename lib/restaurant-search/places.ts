@@ -1,4 +1,4 @@
-import type { LatLng, Place, Restaurant } from "./types";
+import type { Language, LatLng, Place, Restaurant } from "./types";
 
 const PLACES_API = "https://places.googleapis.com/v1";
 
@@ -79,7 +79,7 @@ function toRestaurant(place: GooglePlace): Restaurant | null {
  * 정렬과 리뷰 수 조건은 호출한 쪽(rankRestaurants)이 맡는다.
  */
 export async function searchNearbyRestaurants(
-  search: { center: LatLng; radius: number },
+  search: { center: LatLng; radius: number; language?: Language },
   apiKey: string,
   fetchFn: typeof fetch = fetch
 ): Promise<Restaurant[]> {
@@ -88,7 +88,7 @@ export async function searchNearbyRestaurants(
     NEARBY_FIELDS,
     {
       includedTypes: ["restaurant"],
-      languageCode: "ko",
+      languageCode: search.language ?? "ko",
       maxResultCount: 20,
       rankPreference: "POPULARITY",
       locationRestriction: {

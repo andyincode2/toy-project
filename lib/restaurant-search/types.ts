@@ -10,3 +10,5 @@ export type Restaurant = {
 };
 
 export type Place = { name: string; location: LatLng };
+
+export type Language = "ko" | "en";

@@ -11,7 +11,8 @@ import {
 } from "@vis.gl/react-google-maps";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import type { LatLng, Restaurant } from "@/lib/restaurant-search/types";
+import { messages } from "@/lib/restaurant-search/messages";
+import type { Language, LatLng, Restaurant } from "@/lib/restaurant-search/types";
 
 import { MapErrorBoundary } from "./map-error-boundary";
 
@@ -19,6 +20,7 @@ export type SearchMapProps = {
   origin: LatLng | null;
   radius: number;
   restaurants: Restaurant[];
+  language: Language;
   onPick: (point: LatLng) => void;
 };
 
@@ -52,18 +54,17 @@ export function SearchMap({
   origin,
   radius,
   restaurants,
+  language,
   onPick,
 }: SearchMapProps) {
+  const text = messages[language];
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_API_KEY;
 
   if (!apiKey) {
     return (
       <Alert variant="destructive">
-        <AlertTitle>지도를 표시할 수 없습니다</AlertTitle>
-        <AlertDescription>
-          지도용 API 키(NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_API_KEY)가 설정되지
-          않았습니다.
-        </AlertDescription>
+        <AlertTitle>{text.mapKeyMissing.title}</AlertTitle>
+        <AlertDescription>{text.mapKeyMissing.description}</AlertDescription>
       </Alert>
     );
   }
@@ -72,54 +73,51 @@ export function SearchMap({
     <MapErrorBoundary
       fallback={
         <Alert variant="destructive">
-          <AlertTitle>지도를 불러오지 못했습니다</AlertTitle>
-          <AlertDescription>
-            지도 없이도 식당 목록은 계속 사용할 수 있습니다. 새로고침하면 지도를
-            다시 불러옵니다.
-          </AlertDescription>
+          <AlertTitle>{text.mapError.title}</AlertTitle>
+          <AlertDescription>{text.mapError.description}</AlertDescription>
         </Alert>
       }
     >
-    <div className="h-80 w-full overflow-hidden border md:h-[28rem]">
-      <APIProvider apiKey={apiKey} language="ko" region="KR">
-        <Map
-          mapId="DEMO_MAP_ID"
-          defaultCenter={DEFAULT_CENTER}
-          defaultZoom={DEFAULT_ZOOM}
-          gestureHandling="greedy"
-          disableDefaultUI
-          zoomControl
-          onClick={(event) => {
-            const point = event.detail.latLng;
-            if (point) onPick({ lat: point.lat, lng: point.lng });
-          }}
-        >
-          {origin && (
-            <>
-              <RadiusCircle origin={origin} radius={radius} />
-              <AdvancedMarker position={origin} title="기준 위치">
-                <Pin
-                  background="var(--foreground)"
-                  borderColor="var(--foreground)"
-                  glyphColor="var(--background)"
-                />
+      <div className="h-80 w-full overflow-hidden border md:h-[26rem]">
+        <APIProvider apiKey={apiKey} region="KR">
+          <Map
+            mapId="DEMO_MAP_ID"
+            defaultCenter={DEFAULT_CENTER}
+            defaultZoom={DEFAULT_ZOOM}
+            gestureHandling="greedy"
+            disableDefaultUI
+            zoomControl
+            onClick={(event) => {
+              const point = event.detail.latLng;
+              if (point) onPick({ lat: point.lat, lng: point.lng });
+            }}
+          >
+            {origin && (
+              <>
+                <RadiusCircle origin={origin} radius={radius} />
+                <AdvancedMarker position={origin} title={text.origin}>
+                  <Pin
+                    background="var(--foreground)"
+                    borderColor="var(--foreground)"
+                    glyphColor="var(--background)"
+                  />
+                </AdvancedMarker>
+              </>
+            )}
+            {restaurants.map((restaurant, index) => (
+              <AdvancedMarker
+                key={restaurant.id}
+                position={restaurant.location}
+                title={restaurant.name}
+              >
+                <div className="flex size-6 items-center justify-center rounded-full border border-background bg-primary text-xs font-medium text-primary-foreground">
+                  {index + 1}
+                </div>
               </AdvancedMarker>
-            </>
-          )}
-          {restaurants.map((restaurant, index) => (
-            <AdvancedMarker
-              key={restaurant.id}
-              position={restaurant.location}
-              title={restaurant.name}
-            >
-              <div className="flex size-6 items-center justify-center rounded-full border border-background bg-primary text-xs font-medium text-primary-foreground">
-                {index + 1}
-              </div>
-            </AdvancedMarker>
-          ))}
-        </Map>
-      </APIProvider>
-    </div>
+            ))}
+          </Map>
+        </APIProvider>
+      </div>
     </MapErrorBoundary>
   );
 }

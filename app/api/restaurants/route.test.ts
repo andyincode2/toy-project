@@ -45,7 +45,7 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-test("기준 위치와 반경으로 리뷰 100개 이상 식당만 평점순으로 돌려준다", async () => {
+test("기준 위치와 반경으로 찾은 식당을 리뷰 수와 상관없이 평점순으로 돌려준다", async () => {
   const fetchMock = stubGoogle({
     places: [
       googlePlace("few", 5.0, 3),
@@ -60,10 +60,11 @@ test("기준 위치와 반경으로 리뷰 100개 이상 식당만 평점순으�
 
   expect(response.status).toBe(200);
   expect(body.restaurants.map((r: { id: string }) => r.id)).toEqual([
+    "few",
     "top",
     "mid",
   ]);
-  expect(body.restaurants[0]).toEqual({
+  expect(body.restaurants[1]).toEqual({
     id: "top",
     name: "식당 top",
     rating: 4.8,
@@ -78,8 +79,27 @@ test("기준 위치와 반경으로 리뷰 100개 이상 식당만 평점순으�
   });
 });
 
-test("조건에 맞는 식당이 없으면 빈 목록으로 응답한다", async () => {
-  stubGoogle({ places: [googlePlace("few", 5.0, 3)] });
+test("lang으로 영어를 주면 영어 식당 이름을 받도록 구글에 요청하고 기본은 한국어다", async () => {
+  const fetchMock = stubGoogle({ places: [] });
+
+  await GET(request("lat=37.5&lng=127&radius=500&lang=en"));
+  await GET(request("lat=37.5&lng=127&radius=500"));
+
+  expect(JSON.parse(fetchMock.mock.calls[0][1].body).languageCode).toBe("en");
+  expect(JSON.parse(fetchMock.mock.calls[1][1].body).languageCode).toBe("ko");
+});
+
+test("지원하지 않는 언어는 구글을 호출하지 않고 400으로 거절한다", async () => {
+  const fetchMock = stubGoogle({ places: [] });
+
+  const response = await GET(request("lat=37.5&lng=127&radius=500&lang=fr"));
+
+  expect(response.status).toBe(400);
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+
+test("구글이 식당을 하나도 찾지 못하면 빈 목록으로 응답한다", async () => {
+  stubGoogle({});
 
   const response = await GET(request("lat=37.5&lng=127&radius=500"));
 

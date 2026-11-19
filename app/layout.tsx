@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "맛집 찾기",
-  description: "기준 위치와 반경으로 평점 높은 식당을 찾아 주는 서비스",
+  title: "Dinner Nearby",
+  description: "Find well-rated restaurants near you",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

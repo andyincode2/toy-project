@@ -58,6 +58,18 @@ test("주변 검색은 반경 안의 식당을 한국어 인기순으로 최대 
   });
 });
 
+test("표시 언어를 영어로 주면 식당 이름도 영어로 받도록 요청한다", async () => {
+  const fetchFn = vi.fn().mockResolvedValue(jsonResponse({ places: [] }));
+
+  await searchNearbyRestaurants(
+    { center: { lat: 37.5665, lng: 126.978 }, radius: 1000, language: "en" },
+    "k",
+    fetchFn
+  );
+
+  expect(JSON.parse(fetchFn.mock.calls[0][1].body).languageCode).toBe("en");
+});
+
 test("주변 검색 응답을 식당 이름, 평점, 리뷰 수, 위치, 구글 지도 링크로 바꾼다", async () => {
   const fetchFn = vi
     .fn()
